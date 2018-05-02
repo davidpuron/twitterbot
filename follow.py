@@ -14,18 +14,19 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
+my_user_name=api.me().screen_name
 
 # Count number of friends
 def get_friends(follower):
     return follower.author.friends_count
 
-    # users = []
-    # page_count = 0
-    # for i, user in enumerate(tweepy.Cursor(api.friends, screen_name=user_id).pages()):
-    #     users += user
-    # print("User "+ user_id + " has " + len(users) + " friends")
-    # return len(users)
-
+# check if we are already following the target user (in order to not repeat)
+def is_friend(target_user):
+    status = api.show_friendship(source_screen_name = target_user,target_screen_name =my_user_name)
+    if (status[1].following):
+        return True
+    else:
+        return False
 
 
 if __name__ == "__main__":
@@ -37,14 +38,17 @@ if __name__ == "__main__":
 
     # Find users tweeting about a specific hashtag
     for follower in tweepy.Cursor(api.search, q=HASHTAG).items(1000):
-        friends_number=get_friends(follower)
-        if friends_number>MIN_NUMBER_OF_FRIENDS:
-            print("User followed: " + follower.author.screen_name + ", " + str(friends_number)+ " friends")
-            file.write(follower.author.screen_name+'\n')
-            user = api.get_user(screen_name = follower.author.screen_name)
-            user.follow()
-            remaining_users-=1
-            if remaining_users==0:
-                break
+        if (is_friend(follower.author.screen_name)):
+            print(follower.author.screen_name + " is already followed, don't do anything")
         else:
-            print("User " + " only has " + str(friends_number) + " friends. Dont follow")
+            friends_number=get_friends(follower)
+            if friends_number>MIN_NUMBER_OF_FRIENDS:
+                print("User followed: " + follower.author.screen_name + ", " + str(friends_number)+ " friends")
+                file.write(follower.author.screen_name+'\n')
+                user = api.get_user(screen_name = follower.author.screen_name)
+                user.follow()
+                remaining_users-=1
+                if remaining_users==0:
+                    break
+            else:
+                print("User " + " only has " + str(friends_number) + " friends. Dont follow")
