@@ -31,6 +31,11 @@ def is_friend(target_user):
 
 if __name__ == "__main__":
 
+    HASHTAG=int(raw_input("Introduce el hashtag a seguir: "))
+    USER_NUMBER=int(raw_input("Introduce el numero de usuarios a seguir: "))
+    MIN_NUMBER_OF_FRIENDS=int(raw_input("Introduce el minimo numero de seguidores que tiene que tener un usuario para ser seguido: "))
+    
+
     # Create the file to store user names
     file = open(FILENAME,'w')
 
